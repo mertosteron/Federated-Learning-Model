@@ -1,0 +1,118 @@
+# FedGuard docker-compose (Faz 0 — placeholder iskeleti)
+#
+# Bu dosya fazlar ilerledikçe doldurulacak servislerin iskeletini içerir.
+# Faz 0'da servisler `image: hello-world` ile placeholder olarak çalışır —
+# amaç `docker compose config` sentaks doğrulamasını geçmek ve `make up`'ın
+# herhangi bir hata vermeden ağı ayağa kaldırabildiğini göstermektir.
+#
+# Gerçek iş yükleri şu fazlarda eklenecek:
+#   Faz 3 → bank-node-{1..5}, aggregator-{1..3}
+#   Faz 4 → circuit-compiler bir kez çalışıp devreleri build'e koyar
+#   Faz 6 → besu-validator-{1..4}, ipfs
+#   Faz 7 → grafana, prometheus, dashboard
+
+name: fedguard
+
+networks:
+  fedguard-net:
+    driver: bridge
+
+volumes:
+  ipfs-data:
+  besu-data:
+  aggregator-state:
+
+services:
+  # ─── Banka düğümleri (Faz 3'te gerçek Dockerfile) ─────────────
+  bank-node-1:
+    image: hello-world
+    container_name: fedguard-bank-1
+    networks: [fedguard-net]
+    environment:
+      BANK_ID: "1"
+      FEDGUARD_PHASE: "0"
+    restart: "no"
+
+  bank-node-2:
+    image: hello-world
+    container_name: fedguard-bank-2
+    networks: [fedguard-net]
+    environment:
+      BANK_ID: "2"
+      FEDGUARD_PHASE: "0"
+    restart: "no"
+
+  bank-node-3:
+    image: hello-world
+    container_name: fedguard-bank-3
+    networks: [fedguard-net]
+    environment:
+      BANK_ID: "3"
+      FEDGUARD_PHASE: "0"
+    restart: "no"
+
+  bank-node-4:
+    image: hello-world
+    container_name: fedguard-bank-4
+    networks: [fedguard-net]
+    environment:
+      BANK_ID: "4"
+      FEDGUARD_PHASE: "0"
+    restart: "no"
+
+  bank-node-5:
+    image: hello-world
+    container_name: fedguard-bank-5
+    networks: [fedguard-net]
+    environment:
+      BANK_ID: "5"
+      FEDGUARD_PHASE: "0"
+    restart: "no"
+
+  # ─── Toplayıcı komite (Faz 3'te BFT, şimdilik placeholder) ────
+  aggregator-1:
+    image: hello-world
+    container_name: fedguard-agg-1
+    networks: [fedguard-net]
+    environment:
+      AGG_ID: "1"
+      COMMITTEE_SIZE: "3"
+    restart: "no"
+
+  aggregator-2:
+    image: hello-world
+    container_name: fedguard-agg-2
+    networks: [fedguard-net]
+    environment:
+      AGG_ID: "2"
+      COMMITTEE_SIZE: "3"
+    restart: "no"
+
+  aggregator-3:
+    image: hello-world
+    container_name: fedguard-agg-3
+    networks: [fedguard-net]
+    environment:
+      AGG_ID: "3"
+      COMMITTEE_SIZE: "3"
+    restart: "no"
+
+  # ─── Blokzinciri (Faz 6) ──────────────────────────────────────
+  besu:
+    image: hello-world
+    container_name: fedguard-besu
+    networks: [fedguard-net]
+    volumes:
+      - besu-data:/data
+    environment:
+      BESU_NETWORK: "fedguard-permissioned"
+    restart: "no"
+
+  # ─── Depolama ─────────────────────────────────────────────────
+  ipfs:
+    image: hello-world
+    container_name: fedguard-ipfs
+    networks: [fedguard-net]
+    volumes:
+      - ipfs-data:/data/ipfs
+    restart: "no"

@@ -1,0 +1,62 @@
+name: FedGuard CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate-compose:
+    name: docker-compose doğrulama
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: docker-compose sentaks kontrolü
+        run: docker compose config --quiet
+
+  lint-docs:
+    name: Dokümantasyon bütünlüğü
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Zorunlu dokümanlar var mı
+        run: |
+          test -f docs/THREAT_MODEL.md || (echo "THREAT_MODEL.md eksik" && exit 1)
+          test -f docs/COMPLIANCE.md || (echo "COMPLIANCE.md eksik" && exit 1)
+          test -f docs/ARCHITECTURE.md || (echo "ARCHITECTURE.md eksik" && exit 1)
+          test -f README.md || (echo "README.md eksik" && exit 1)
+          test -f Makefile || (echo "Makefile eksik" && exit 1)
+
+  python-tests:
+    name: Python testleri
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Python kur
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: pytest kur
+        run: pip install pytest
+      - name: Testleri çalıştır
+        run: |
+          mkdir -p tests
+          pytest -q tests/ || (
+            echo "Faz 0 için boş test suite kabul edilir."
+            # Faz 0 kabulü: herhangi bir test yoksa başarı sayılır.
+            test -z "$(ls -A tests 2>/dev/null)" && exit 0 || exit 1
+          )
+
+  secrets-scan:
+    name: Gizli anahtar taraması
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Ham PII veya .env sızıntısı kontrolü
+        run: |
+          if git ls-files | grep -E '\.(env|pem|key)$' | grep -v '.env.example'; then
+            echo "Gizli dosya commit'lenmiş — engellendi"
+            exit 1
+          fi
+          echo "OK — gizli dosya yok"

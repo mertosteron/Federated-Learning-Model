@@ -1,5 +1,68 @@
-
-# ignore all.txt files
+# Varolan kurallar (korundu)
 *.txt
 CLAUDE.md
 
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+dist/
+build/
+
+# Notebook
+.ipynb_checkpoints/
+
+# Node / TS
+node_modules/
+dashboard/dist/
+dashboard/.next/
+*.tsbuildinfo
+
+# ZK artefaktları (trusted setup çıktıları)
+circuits/build/
+circuits/ptau/*.ptau
+circuits/*.zkey
+circuits/*.r1cs
+circuits/*.sym
+circuits/*.wasm
+circuits/verification_key.json
+
+# Solidity / Hardhat
+contracts/artifacts/
+contracts/cache/
+contracts/typechain-types/
+
+# Veri (gerçek PII ASLA)
+data/
+simulation/generated/
+simulation/ground_truth.parquet
+*.parquet
+*.csv
+!tests/**/*.csv
+
+# Gizli anahtarlar — CLAUDE.md Faz 7 güvenlik check-list'i
+.env
+.env.local
+*.pem
+*.key
+!*.example
+
+# Çıktılar
+*.log
+logs/
+fl_global_model.pth
+
+# IDE
+.vscode/
+.idea/
+*.swp
+.DS_Store
